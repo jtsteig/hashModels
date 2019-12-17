@@ -1,4 +1,4 @@
-package main
+package hashmodels
 
 import (
 	"database/sql"
