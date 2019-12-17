@@ -52,7 +52,7 @@ func (dataconnection *HashRepository) InitTables() error {
 }
 
 // StoreHash stores a hashed string and the milliseconds to hash it returning an error on error or nil error on success.
-func (dataconnection *HashRepository) StoreHash(hash string, hashTimeInMilliseconds int) (int, error) {
+func (dataconnection *HashRepository) StoreHash(hash string, hashTimeInMilliseconds int64) (int, error) {
 	query := fmt.Sprintf("INSERT INTO %s (hashValue, hashTimeInMilliseconds, countID) VALUES (?, ?, (SELECT COUNT(countID) + 1 FROM %s))", dataconnection.hashTableName, dataconnection.hashTableName)
 	insert, err := dataconnection.db.Prepare(query)
 	if err != nil {
