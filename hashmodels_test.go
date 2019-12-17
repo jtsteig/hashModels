@@ -15,12 +15,12 @@ func TestSqlIteHashStoreHappyPath(t *testing.T) {
 		t.Errorf("Failed to init db: %q", initErr)
 	}
 
-	countID, storeError := hashStore.storeHash("testHash", 500)
+	countID, storeError := hashStore.StoreHash("testHash", 500)
 	if storeError != nil {
 		t.Errorf("Failed to store hash: %q", storeError)
 	}
 
-	result, hashErr := hashStore.getHashStat(countID)
+	result, hashErr := hashStore.GetHashStat(countID)
 	if hashErr != nil {
 		t.Errorf("Error getting hashStats: %q", hashErr)
 	}
@@ -36,11 +36,11 @@ func TestSqlIteHashStoreHappyPath(t *testing.T) {
 		t.Errorf("Got incorrect hashtime value: %q and expected %q", expected.hashTimeInMilliseconds, result.hashTimeInMilliseconds)
 	}
 
-	dropErr := hashStore.clearStore()
+	dropErr := hashStore.ClearStore()
 	if dropErr != nil {
 		t.Errorf("Failed to drop table %q", dropErr)
 	}
-	closeErr := hashStore.close()
+	closeErr := hashStore.Close()
 	if closeErr != nil {
 		t.Errorf("Failed to close db: %q", closeErr)
 	}
