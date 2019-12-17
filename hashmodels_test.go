@@ -26,14 +26,14 @@ func TestSqlIteHashStoreHappyPath(t *testing.T) {
 	}
 
 	expected := HashStat{"testHash", countID, 500}
-	if expected.hashValue != result.hashValue {
-		t.Errorf("Got incorrect hash value: %q and expected %q", expected.hashValue, result.hashValue)
+	if expected.HashValue != result.HashValue {
+		t.Errorf("Got incorrect hash value: %q and expected %q", expected.HashValue, result.HashValue)
 	}
-	if expected.countID != result.countID {
-		t.Errorf("Got incorrect countId: %q and expected %q", expected.countID, result.countID)
+	if expected.CountID != result.CountID {
+		t.Errorf("Got incorrect countId: %q and expected %q", expected.CountID, result.CountID)
 	}
-	if expected.hashTimeInMilliseconds != result.hashTimeInMilliseconds {
-		t.Errorf("Got incorrect hashtime value: %q and expected %q", expected.hashTimeInMilliseconds, result.hashTimeInMilliseconds)
+	if expected.HashTimeInMilliseconds != result.HashTimeInMilliseconds {
+		t.Errorf("Got incorrect hashtime value: %q and expected %q", expected.HashTimeInMilliseconds, result.HashTimeInMilliseconds)
 	}
 
 	dropErr := hashStore.ClearStore()

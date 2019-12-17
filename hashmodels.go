@@ -16,15 +16,15 @@ type HashRepository struct {
 
 // HashStat represents the schema for the values stored in the Hashsets.
 type HashStat struct {
-	hashValue              string
-	countID                int
-	hashTimeInMilliseconds int
+	HashValue              string
+	CountID                int
+	HashTimeInMilliseconds int64
 }
 
 // TotalStats presents the schema for the total stats queried from the DB for all queries.
 type TotalStats struct {
-	count       int
-	averageTime float32
+	Count       int
+	AverageTime float32
 }
 
 // NewHashStore creates an initialized HashStore
@@ -78,7 +78,7 @@ func (dataconnection *HashRepository) GetHashStat(countID int) (HashStat, error)
 	defer rows.Close()
 
 	var hashValue string
-	var hashTimeInMilliseconds int
+	var hashTimeInMilliseconds int64
 	rows.Next()
 	rows.Scan(&hashValue, &hashTimeInMilliseconds)
 	return HashStat{hashValue, countID, hashTimeInMilliseconds}, nil
