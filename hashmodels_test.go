@@ -36,6 +36,19 @@ func TestSqlIteHashStoreHappyPath(t *testing.T) {
 		t.Errorf("Got incorrect hashtime value: %q and expected %q", expected.HashTimeInMilliseconds, result.HashTimeInMilliseconds)
 	}
 
+	hashStore.StoreHash("testHash2", 500)
+	hashStore.StoreHash("testHash3", 500)
+	hashStore.StoreHash("testHash4", 500)
+	hashStore.StoreHash("testHash5", 500)
+
+	totalResults, totalErr := hashStore.GetTotalStats()
+	if totalErr != nil {
+		t.Errorf("Error getting totalStats: %q", totalErr)
+	}
+	if totalResults.Count != 1 {
+		t.Errorf("Error getting the totalCount. Expected %d but got %d", 5, totalResults.Count)
+	}
+
 	dropErr := hashStore.ClearStore()
 	if dropErr != nil {
 		t.Errorf("Failed to drop table %q", dropErr)

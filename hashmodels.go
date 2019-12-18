@@ -86,12 +86,12 @@ func (dataconnection *HashRepository) GetHashStat(countID int) (HashStat, error)
 
 // GetTotalStats gets the total stats for all hashes.
 func (dataconnection *HashRepository) GetTotalStats() (TotalStats, error) {
-	query := fmt.Sprintf("SELECT COUNT(countID), AVG(hashTimeInMilliseconds from %s", dataconnection.hashTableName)
+	query := fmt.Sprintf("SELECT COUNT(countID), AVG(hashTimeInMilliseconds) from %s", dataconnection.hashTableName)
 	rows, queryError := dataconnection.db.Query(query)
 	if queryError != nil {
 		return TotalStats{}, queryError
 	}
-	rows.Close()
+	defer rows.Close()
 
 	var count int
 	var avgTime float32
