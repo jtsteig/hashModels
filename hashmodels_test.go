@@ -15,9 +15,13 @@ func TestSqlIteHashStoreHappyPath(t *testing.T) {
 		t.Errorf("Failed to init db: %q", initErr)
 	}
 
-	countID, storeError := hashStore.StoreHash("testHash", 500)
-	if storeError != nil {
-		t.Errorf("Failed to store hash: %q", storeError)
+	countID, createError := hashStore.CreateEmptyHashEntry()
+	if createError != nil {
+		t.Errorf("Failed to create hash entry: %q", createError)
+	}
+	expected := HashStat{"testHash1", countID, 444}
+	if storeError := hashStore.UpdateHashWithValues(expected.CountID, expected.HashValue, expected.HashTimeInMilliseconds); storeError != nil {
+		t.Errorf("Error updating the hash values after creation: %q", storeError)
 	}
 
 	result, hashErr := hashStore.GetHashStat(countID)
@@ -25,7 +29,6 @@ func TestSqlIteHashStoreHappyPath(t *testing.T) {
 		t.Errorf("Error getting hashStats: %q", hashErr)
 	}
 
-	expected := HashStat{"testHash", countID, 500}
 	if expected.HashValue != result.HashValue {
 		t.Errorf("Got incorrect hash value: %q and expected %q", expected.HashValue, result.HashValue)
 	}
@@ -36,16 +39,16 @@ func TestSqlIteHashStoreHappyPath(t *testing.T) {
 		t.Errorf("Got incorrect hashtime value: %q and expected %q", expected.HashTimeInMilliseconds, result.HashTimeInMilliseconds)
 	}
 
-	hashStore.StoreHash("testHash2", 500)
-	hashStore.StoreHash("testHash3", 500)
-	hashStore.StoreHash("testHash4", 500)
-	hashStore.StoreHash("testHash5", 500)
+	hashStore.CreateEmptyHashEntry()
+	hashStore.CreateEmptyHashEntry()
+	hashStore.CreateEmptyHashEntry()
+	hashStore.CreateEmptyHashEntry()
 
 	totalResults, totalErr := hashStore.GetTotalStats()
 	if totalErr != nil {
 		t.Errorf("Error getting totalStats: %q", totalErr)
 	}
-	if totalResults.Count != 1 {
+	if totalResults.Count != 5 {
 		t.Errorf("Error getting the totalCount. Expected %d but got %d", 5, totalResults.Count)
 	}
 

@@ -17,7 +17,7 @@ type HashRepository struct {
 // HashStat represents the schema for the values stored in the Hashsets.
 type HashStat struct {
 	HashValue              string
-	CountID                int
+	CountID                int64
 	HashTimeInMilliseconds int64
 }
 
@@ -51,25 +51,41 @@ func (dataconnection *HashRepository) InitTables() error {
 	return nil
 }
 
-// StoreHash stores a hashed string and the milliseconds to hash it returning an error on error or nil error on success.
-func (dataconnection *HashRepository) StoreHash(hash string, hashTimeInMilliseconds int64) (int, error) {
-	query := fmt.Sprintf("INSERT INTO %s (hashValue, hashTimeInMilliseconds, countID) VALUES (?, ?, (SELECT COUNT(countID) + 1 FROM %s))", dataconnection.hashTableName, dataconnection.hashTableName)
+// CreateEmptyHashEntry puts a stub entry into the hash table with no other data.
+func (dataconnection *HashRepository) CreateEmptyHashEntry() (int64, error) {
+	query := fmt.Sprintf("INSERT INTO %s (countID) VALUES ((SELECT COUNT(countID) + 1 FROM %s))", dataconnection.hashTableName, dataconnection.hashTableName)
 	insert, err := dataconnection.db.Prepare(query)
 	if err != nil {
 		return -1, err
 	}
 	defer insert.Close()
-	rows, execErr := insert.Exec(hash, hashTimeInMilliseconds)
+	rows, execErr := insert.Exec()
 	if execErr != nil {
 		return -1, execErr
 	}
 
 	countID, _ := rows.LastInsertId()
-	return int(countID), nil
+	return countID, nil
+}
+
+// UpdateHashWithValues stores a hashed string and the milliseconds to hash it returning an error on error or nil error on success.
+func (dataconnection *HashRepository) UpdateHashWithValues(countID int64, hash string, hashTimeInMilliseconds int64) error {
+	query := fmt.Sprintf("UPDATE %s SET hashValue = ?, hashTimeInMilliseconds = ? WHERE countID = ?", dataconnection.hashTableName)
+	insert, err := dataconnection.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer insert.Close()
+	_, execErr := insert.Exec(hash, hashTimeInMilliseconds, countID)
+	if execErr != nil {
+		return execErr
+	}
+
+	return nil
 }
 
 // GetHashStat returns the HashStat for a stored countID or an error on error.
-func (dataconnection *HashRepository) GetHashStat(countID int) (HashStat, error) {
+func (dataconnection *HashRepository) GetHashStat(countID int64) (HashStat, error) {
 	query := fmt.Sprintf("SELECT hashValue, hashTimeInMilliseconds from %s where countID=?", dataconnection.hashTableName)
 	rows, queryError := dataconnection.db.Query(query, countID)
 	if queryError != nil {
